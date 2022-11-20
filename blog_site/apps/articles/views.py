@@ -1,6 +1,7 @@
 from django.forms import model_to_dict
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Article, Category
@@ -87,3 +88,13 @@ class GetManyColumns(APIView):
             cat = Category.objects.get(id=number_of_cat).name
             elem["cat"] = cat
         return Response({"id, title, category": columns})
+
+
+class ArticleViewSets(viewsets.ModelViewSet):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+
+    @action(methods=["get"], detail=False)
+    def category(self, request):
+        cats = Category.objects.all()
+        return Response({"categories": [c.name for c in cats]})
