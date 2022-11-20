@@ -14,7 +14,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ("id", "title", "cats")
+        fields = "__all__"
 
 
 class ArticleTestSerializer(serializers.Serializer):

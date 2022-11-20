@@ -8,7 +8,17 @@ from .serializers import ArticleSerializer, ArticleTestSerializer
 from rest_framework.views import APIView
 
 
-class ArticleAPIView(generics.ListAPIView):
+class ArticleAPIView(generics.ListCreateAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+
+
+class ArticleUpdateAPIView(generics.UpdateAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+
+
+class ArticleCRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
 
@@ -60,3 +70,20 @@ class TestAPIView(APIView):
         instance.delete()
         return Response({"delete": "post" + str(pk)})
 
+
+class GetArticlesNames(APIView):
+
+    def get(self, request):
+        instance = Article.objects.values("title")
+        return Response({"titles": list(instance)})
+
+
+class GetManyColumns(APIView):
+
+    def get(self, request):
+        columns = Article.objects.values("id", "title", "cat")
+        for elem in columns:
+            number_of_cat = elem["cat"]
+            cat = Category.objects.get(id=number_of_cat).name
+            elem["cat"] = cat
+        return Response({"id, title, category": columns})
