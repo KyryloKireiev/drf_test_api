@@ -1,6 +1,7 @@
 from django.forms import model_to_dict
 from django.shortcuts import render
 from rest_framework import generics, viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -9,7 +10,7 @@ from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import ArticleSerializer, ArticleTestSerializer
 from rest_framework.views import APIView
 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
 
 
 class ArticleAPIView(generics.ListCreateAPIView):
@@ -106,13 +107,15 @@ class ArticleViewSets(viewsets.ModelViewSet):
 class ArticleAPIList(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    # permission_classes = (IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsAuthenticated, )
 
 
 class ArticleAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = (IsOwnerOrReadOnly, )
+    # permission_classes = (IsOwnerOrReadOnly, )
+    authentication_classes = (TokenAuthentication, )
 
 
 class ArticleAPIDestroy(generics.RetrieveDestroyAPIView):
