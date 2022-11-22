@@ -5,7 +5,11 @@ from .views import ArticleAPIView, \
     ArticleCRUDAPIView, \
     GetArticlesNames, \
     GetManyColumns, \
-    ArticleViewSets
+    ArticleViewSets, \
+    ArticleAPIList, \
+    ArticleAPIUpdate, \
+    ArticleAPIDestroy
+
 from rest_framework import routers
 
 router = routers.SimpleRouter()
@@ -25,5 +29,9 @@ urlpatterns = [
     path("articles_view_sets/", ArticleViewSets.as_view({"get": "list"})),
     path("articles_view_sets/<int:pk>/", ArticleViewSets.as_view({"put": "update"})),
 
-    path("", include(router.urls), basename="article ")
+    path("", include(router.urls), name="article "),
+
+    path("articles_api_list/", ArticleAPIList.as_view(), name="articles_api_list"),
+    path("articles_api_update/<int:pk>/", ArticleAPIUpdate.as_view(), name="articles_api_update"),
+    path("articles_api_destroy/<int:pk>/", ArticleAPIDestroy.as_view(), name="articles_api_destroy"),
 ]

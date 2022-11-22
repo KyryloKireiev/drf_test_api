@@ -5,8 +5,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Article, Category
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import ArticleSerializer, ArticleTestSerializer
 from rest_framework.views import APIView
+
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 
 
 class ArticleAPIView(generics.ListCreateAPIView):
@@ -98,3 +101,21 @@ class ArticleViewSets(viewsets.ModelViewSet):
     def category(self, request):
         cats = Category.objects.all()
         return Response({"categories": [c.name for c in cats]})
+
+
+class ArticleAPIList(generics.ListCreateAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+
+
+class ArticleAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+    permission_classes = (IsOwnerOrReadOnly, )
+
+
+class ArticleAPIDestroy(generics.RetrieveDestroyAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAdminOrReadOnly, )
