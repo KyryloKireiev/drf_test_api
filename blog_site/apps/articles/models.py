@@ -11,6 +11,9 @@ class Article(models.Model):
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
     user = models.ForeignKey(User, verbose_name="user", on_delete=models.CASCADE)
 
+    class Meta:
+        indexes = [models.Index(fields=["title", "content"])]
+
     def __str__(self):
         return self.title
 
