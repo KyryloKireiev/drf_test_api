@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+import psycopg2
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -93,17 +94,29 @@ WSGI_APPLICATION = 'blog_site.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-   'default': {
-      'ENGINE': 'django.db.backends.postgresql',
-      'NAME': 'test_base',
-      'USER': 'postgres',
-      'PASSWORD': '1358',
-      'HOST': 'localhost',
-      'PORT': '5432',
-   }
-}
+# database postgres in local machine:
+# DATABASES = {
+#    'default': {
+#       'ENGINE': 'django.db.backends.postgresql',
+#       'NAME': 'test_base',
+#       'USER': 'postgres',
+#       'PASSWORD': '1358',
+#       'HOST': 'localhost',
+#       'PORT': '5432',
+#    }
+# }
 
+# database postgres in Docker container:
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "blog_site",
+        "USER": "kyrylo",
+        "PASSWORD": "password",
+        "HOST": "0.0.0.0",
+        "PORT": "5432",
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
