@@ -2,8 +2,9 @@ from django.forms import model_to_dict
 from django.shortcuts import render
 from rest_framework import generics, viewsets
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from .models import Article, Category
 from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
@@ -11,6 +12,7 @@ from .serializers import ArticleSerializer, ArticleTestSerializer
 from rest_framework.views import APIView
 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
+from .pagination import MyCursorPagination
 
 
 class ArticleAPIView(generics.ListCreateAPIView):
@@ -109,6 +111,7 @@ class ArticleAPIList(generics.ListCreateAPIView):
     serializer_class = ArticleSerializer
     # permission_classes = (IsAuthenticatedOrReadOnly, )
     permission_classes = (IsAuthenticated, )
+    pagination_class = MyCursorPagination
 
 
 class ArticleAPIUpdate(generics.RetrieveUpdateAPIView):
@@ -122,3 +125,46 @@ class ArticleAPIDestroy(generics.RetrieveDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = (IsAdminOrReadOnly, )
+
+
+@api_view(["GET", ])
+def my_view(request):
+    elements_per_page = 3
+    start_idx = int(request.query_params.get("start", 1))
+    articles = Article.objects.filter(pk__gt=start_idx - 1)[:elements_per_page]
+
+    length = Article.objects.count()
+
+    next_pg = length
+
+    if start_idx > elements_per_page:
+        prev_pg = start_idx - elements_per_page
+    else:
+        prev_pg = 0
+
+    if start_idx <= length - elements_per_page:
+        next_pg = start_idx + elements_per_page
+
+    # articles = Article.objects.all()[start_idx: start_idx + elements_per_page:]
+    # print(request.get_full_path())
+    # print(request.build_absolute_uri())
+
+    if Article.objects.get(pk=1) != articles[0]:
+        prev_pg_url = request.build_absolute_uri(f"/api/v1/custom_cursor_pagination/?start={prev_pg}")
+    else:
+        prev_pg_url = None
+
+    if next_pg < length:
+        next_pg_url = request.build_absolute_uri(f"/api/v1/custom_cursor_pagination/?start={next_pg}")
+    else:
+        next_pg_url = None
+
+    counter = len(articles)
+
+    return Response({
+        "counter_objects_on_page": counter,
+        "prev_page": prev_pg_url,
+        "next_page": next_pg_url,
+        "elements": ArticleSerializer(articles, many=True).data,
+    })
+

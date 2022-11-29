@@ -8,7 +8,8 @@ from .views import ArticleAPIView, \
     ArticleViewSets, \
     ArticleAPIList, \
     ArticleAPIUpdate, \
-    ArticleAPIDestroy
+    ArticleAPIDestroy, \
+    my_view
 
 from rest_framework import routers
 
@@ -34,4 +35,7 @@ urlpatterns = [
     path("articles_api_list/", ArticleAPIList.as_view(), name="articles_api_list"),
     path("articles_api_update/<int:pk>/", ArticleAPIUpdate.as_view(), name="articles_api_update"),
     path("articles_api_destroy/<int:pk>/", ArticleAPIDestroy.as_view(), name="articles_api_destroy"),
+
+    path("custom_cursor_pagination/", my_view, name="custom_cursor_pagination")
+
 ]
