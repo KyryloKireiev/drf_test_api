@@ -129,8 +129,10 @@ class ArticleAPIDestroy(generics.RetrieveDestroyAPIView):
 
 @api_view(["GET", ])
 def my_view(request):
-    elements_per_page = 3
+    elements_per_page = 5
     start_idx = int(request.query_params.get("start", 1))
+    if start_idx <= 0:
+        return Response({"error": "start index must be > 0"})
     articles = Article.objects.filter(pk__gt=start_idx - 1)[:elements_per_page]
 
     length = Article.objects.count()
@@ -140,7 +142,7 @@ def my_view(request):
     if start_idx > elements_per_page:
         prev_pg = start_idx - elements_per_page
     else:
-        prev_pg = 0
+        prev_pg = 1
 
     if start_idx <= length - elements_per_page:
         next_pg = start_idx + elements_per_page
@@ -154,7 +156,14 @@ def my_view(request):
     else:
         prev_pg_url = None
 
-    if next_pg < length:
+    # if next_pg < length:
+    #     next_pg_url = request.build_absolute_uri(f"/api/v1/custom_cursor_pagination/?start={next_pg}")
+    # else:
+    #     next_pg_url = None
+
+    last_obj_in_slice = tuple(articles)[-1]
+
+    if Article.objects.last() != last_obj_in_slice:
         next_pg_url = request.build_absolute_uri(f"/api/v1/custom_cursor_pagination/?start={next_pg}")
     else:
         next_pg_url = None
